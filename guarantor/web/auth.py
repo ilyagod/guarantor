@@ -1,3 +1,5 @@
+from typing import Type
+
 from fastapi import Depends, HTTPException, Security
 from fastapi.security import APIKeyHeader
 from starlette.status import HTTP_403_FORBIDDEN
@@ -12,7 +14,7 @@ async def get_user_by_api_key(
     api_key: str = Security(api_key_header),
     api_client_dao: ApiClientDAO = Depends(),
 ) -> ApiClient:
-    api_client = await api_client_dao.get(token=api_key)
+    api_client = await api_client_dao.get_or_none({'token': api_key})
     if not api_client:
         raise HTTPException(
             status_code=HTTP_403_FORBIDDEN,
