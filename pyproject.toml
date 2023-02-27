@@ -71,7 +71,6 @@ env = [
 tortoise_orm = "guarantor.db.config.TORTOISE_CONFIG"
 location = "./guarantor/db/migrations"
 src_folder = "./guarantor"
-
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
