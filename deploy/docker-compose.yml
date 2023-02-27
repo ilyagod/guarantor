@@ -1,0 +1,90 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile
+    image: guarantor:${GUARANTOR_VERSION:-latest}
+    restart: always
+    env_file:
+    - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      GUARANTOR_HOST: 0.0.0.0
+      GUARANTOR_DB_HOST: guarantor-db
+      GUARANTOR_DB_PORT: 5432
+      GUARANTOR_DB_USER: guarantor
+      GUARANTOR_DB_PASS: guarantor
+      GUARANTOR_DB_BASE: guarantor
+      TESTKAFKA_KAFKA_BOOTSTRAP_SERVERS: '["guarantor-kafka:9092"]'
+
+  db:
+    image: postgres:13.8-bullseye
+    hostname: guarantor-db
+    environment:
+      POSTGRES_PASSWORD: "guarantor"
+      POSTGRES_USER: "guarantor"
+      POSTGRES_DB: "guarantor"
+    volumes:
+    - guarantor-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: pg_isready -U guarantor
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+  migrator:
+    image: guarantor:${GUARANTOR_VERSION:-latest}
+    restart: "no"
+    command: aerich upgrade
+    environment:
+      GUARANTOR_DB_HOST: guarantor-db
+      GUARANTOR_DB_PORT: 5432
+      GUARANTOR_DB_USER: guarantor
+      GUARANTOR_DB_PASS: guarantor
+      GUARANTOR_DB_BASE: guarantor
+    depends_on:
+      db:
+        condition: service_healthy
+
+  zookeeper:
+    image: "bitnami/zookeeper:3.7.1"
+    hostname: "guarantor-zookeeper"
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+      ZOO_LOG_LEVEL: "ERROR"
+    healthcheck:
+      test: zkServer.sh status
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+  kafka:
+    image: "bitnami/kafka:3.2.0"
+    hostname: "guarantor-kafka"
+    environment:
+      KAFKA_BROKER_ID: "1"
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_CFG_LISTENERS: "PLAINTEXT://0.0.0.0:9092"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "PLAINTEXT://guarantor-kafka:9092"
+      KAFKA_CFG_ZOOKEEPER_CONNECT: "guarantor-zookeeper:2181"
+    healthcheck:
+      test: kafka-topics.sh --list --bootstrap-server localhost:9092
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+
+
+
+volumes:
+  guarantor-db-data:
+    name: guarantor-db-data
