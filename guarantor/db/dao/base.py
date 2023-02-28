@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any, Dict, Generic, List, Tuple, Type, TypeVar, Union, Optional
+from typing import Any, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
 import tortoise
 
@@ -49,7 +49,10 @@ class BaseDAO(ABC, Generic[DAOModel]):
 
     @classmethod
     async def get_all(
-        cls, limit: int, offset: int, with_count: bool = False
+        cls,
+        limit: int,
+        offset: int,
+        with_count: bool = False,
     ) -> Union[Tuple[List[DAOModel], int], List[DAOModel]]:
         """
         Get all models with limit/offset pagination.
@@ -67,7 +70,11 @@ class BaseDAO(ABC, Generic[DAOModel]):
 
     @classmethod
     async def _get_all_with_prefetch(
-        cls, limit: int, offset: int, prefetch: str, with_count: bool = False
+        cls,
+        limit: int,
+        offset: int,
+        prefetch: str,
+        with_count: bool = False,
     ) -> Union[tuple[list[DAOModel], int], list[DAOModel]]:
         data = (
             await cls._model.all()
@@ -92,7 +99,9 @@ class BaseDAO(ABC, Generic[DAOModel]):
 
     @classmethod
     async def filter_with_order(
-        cls, filter_data: Dict[str, Any], order_col_name: str
+        cls,
+        filter_data: Dict[str, Any],
+        order_col_name: str,
     ) -> List[DAOModel]:
         query = cls._model.all().filter(**filter_data).order_by(order_col_name)
         return await query
@@ -118,4 +127,6 @@ class BaseDAO(ABC, Generic[DAOModel]):
     async def exclude(cls, data: Dict[str, Any]) -> List[DAOModel]:
         return await cls._model.exclude(**data)
 
-
+    @classmethod
+    async def get_or_none(cls, data: Dict[str, Any]) -> Optional[DAOModel]:
+        return await cls._model.get_or_none(**data)
