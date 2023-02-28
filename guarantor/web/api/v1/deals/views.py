@@ -5,8 +5,11 @@ from fastapi import APIRouter, Depends, Security
 from guarantor.db.dao.deal import DealDAO
 from guarantor.db.models.api_client import ApiClient
 from guarantor.db.models.deal import Deal
-from guarantor.web.api.v1.deals.schema import (DealCreateSchema, DealResponseSchema,
-                                               DealUpdateSchema)
+from guarantor.web.api.v1.deals.schema import (
+    DealCreateSchema,
+    DealResponseSchema,
+    DealUpdateSchema,
+)
 from guarantor.web.auth import get_user_by_api_key
 from guarantor.web.dependencies import valid_owned_deal
 
@@ -53,4 +56,3 @@ async def update_deal(
     Partial update сделки
     """
     return await deal_dao.update(deal.id, data.dict(exclude_none=True))
-

@@ -37,11 +37,11 @@ class DealResponseSchema(BaseModel):
 
 
 class DealUpdateSchema(BaseModel):
-    title: str = None
-    description: str = None
-    price: float = None
-    currency: Currency = None
-    status: DealStatus = None
-    deadline_at: datetime.datetime = None
-    customer_id: int = None
-    performer_id: int = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[float] = None
+    currency: Optional[Currency] = None
+    status: Optional[DealStatus] = None
+    deadline_at: Optional[datetime.datetime] = None
+    customer_id: Optional[int] = None
+    performer_id: Optional[int] = None
