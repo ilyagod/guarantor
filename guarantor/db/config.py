@@ -5,6 +5,7 @@ from guarantor.settings import settings
 MODELS_MODULES: List[str] = [
     "guarantor.db.models.api_client",
     "guarantor.db.models.deal",
+    "guarantor.db.models.dispute",
 ]  # noqa: WPS407
 
 TORTOISE_CONFIG = {  # noqa: WPS407

@@ -13,11 +13,12 @@ async def valid_owned_deal(
     api_client: ApiClient = Security(get_user_by_api_key),
     deal_dao: DealDAO = Depends(),
 ) -> Mapping:
-    deal = await deal_dao.get_or_none(
+    deal = await deal_dao.get_or_none_with_prefetch(
         {
             "api_client": api_client,
             "id": deal_id,
         },
+        "dispute",
     )
     if not deal:
         raise HTTPException(

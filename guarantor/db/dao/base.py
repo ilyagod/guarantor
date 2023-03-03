@@ -34,9 +34,11 @@ class BaseDAO(ABC, Generic[DAOModel]):
             await model.save()
 
     @classmethod
-    async def update(cls, id_: int, data: Dict[str, Any]) -> DAOModel:
-        obj = await cls._model.get(id=id_)
-
+    async def update(cls, id_: int, data: Dict[str, Any], prefetch: str = None) -> DAOModel:
+        query = cls._model.get(id=id_)
+        if prefetch:
+            query = query.prefetch_related(prefetch)
+        obj = await query
         for k, v in data.items():
             setattr(obj, k, v)
 
@@ -130,3 +132,11 @@ class BaseDAO(ABC, Generic[DAOModel]):
     @classmethod
     async def get_or_none(cls, data: Dict[str, Any]) -> Optional[DAOModel]:
         return await cls._model.get_or_none(**data)
+
+    @classmethod
+    async def get_or_none_with_prefetch(
+        cls,
+        data: Dict[str, Any],
+        prefetch: str
+    ) -> Optional[DAOModel]:
+        return await cls._model.get_or_none(**data).prefetch_related(prefetch)
