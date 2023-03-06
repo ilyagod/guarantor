@@ -53,12 +53,13 @@ def configure_logging() -> None:  # pragma: no cover
 
     # change handler for default uvicorn logger
     intercept_handler = InterceptHandler()
-    logging.getLogger("uvicorn").handlers = [intercept_handler]
-    logging.getLogger("uvicorn.access").handlers = [intercept_handler]
+    # logging.getLogger("uvicorn").handlers = [intercept_handler]
+    # logging.getLogger("uvicorn.access").handlers = [intercept_handler]
 
     # set logs output, level and format
     logger.remove()
     logger.add(
         sys.stdout,
         level=settings.log_level.value,
+        serialize=True,
     )

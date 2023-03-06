@@ -18,6 +18,6 @@ class DealStatus(str, Enum):
 
 
 class DisputeStatus(str, Enum):
-    OPEN = 'open'
-    CLOSED_SUCCESS = 'closed_success'
-    CLOSED_REJECTED = 'closed_rejected'
+    OPEN = "open"
+    CLOSED_SUCCESS = "closed_success"
+    CLOSED_REJECTED = "closed_rejected"

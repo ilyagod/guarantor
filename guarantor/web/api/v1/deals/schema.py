@@ -15,6 +15,7 @@ class DisputeCreateSchema(BaseModel):
 
 class DisputeResponseSchema(BaseModel):
     """Схема ответа для спора внутри сделки"""
+
     title: str
     description: str
     status: DisputeStatus
@@ -22,6 +23,7 @@ class DisputeResponseSchema(BaseModel):
 
 class DisputeUpdateSchema(BaseModel):
     """Схема обновления спора"""
+
     title: Optional[str]
     description: Optional[str]
     status: Optional[DisputeStatus]
@@ -69,4 +71,3 @@ class DealUpdateSchema(BaseModel):
     deadline_at: Optional[datetime.datetime] = None
     customer_id: Optional[int] = None
     performer_id: Optional[int] = None
-

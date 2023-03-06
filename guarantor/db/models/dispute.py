@@ -6,7 +6,7 @@ from guarantor.enums import DisputeStatus
 class Dispute(models.Model):
     id = fields.IntField(pk=True)
 
-    deal = fields.OneToOneField('models.Deal', related_name='dispute')
+    deal = fields.OneToOneField("models.Deal", related_name="dispute")
 
     title = fields.CharField(max_length=128)
     description = fields.TextField()
@@ -15,4 +15,4 @@ class Dispute(models.Model):
     created_at = fields.DatetimeField(auto_now_add=True)
 
     class Meta:
-        table = 'disputes'
+        table = "disputes"
