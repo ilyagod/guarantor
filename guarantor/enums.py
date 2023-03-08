@@ -5,16 +5,21 @@ class Currency(str, Enum):
     RUB = "RUB"
     EUR = "EUR"
     USD = "USD"
+    USDT = "USDT"
 
 
 class DealStatus(str, Enum):
-    UNCONFIRMED = "unconfirmed"
-    CONFIRMED = "confirmed"
-    CANCELLED = "cancelled"
-    COMPLETED = "completed"
-    DISPUTE_OPENED = "dispute_opened"
-    COMPLETED_AFTER_DISPUTE = "completed_after_dispute"
-    REJECTED_AFTER_DISPUTE = "rejected_after_dispute"
+    CREATED = "created"
+    DENY_PERFORMER = "deny_performer"
+    CONFIRM_PERFORMER = "confirm_performer"
+    IN_PROCESS = "in_process"
+    CLOSE = "close"
+    ARB_CLOSE_CUSTOMER = "arb_close_customer"
+    ARB_CLOSE_PERFORMER = "arb_close_performer"
+
+
+class DealType(str, Enum):
+    COMMON = "common"
 
 
 class DisputeStatus(str, Enum):

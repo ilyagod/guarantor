@@ -2,10 +2,32 @@ import datetime
 from typing import Optional
 
 from pydantic import BaseModel
+from tortoise.contrib.pydantic import pydantic_model_creator
 
-from guarantor.enums import Currency, DealStatus, DisputeStatus
+from guarantor.db.models.deal import Deal
+from guarantor.enums import Currency
 
 
+# DealCreateSchema = pydantic_model_creator(Deal, name='Create deal')
+class DealCreateSchema(BaseModel):
+    """Схема запроса для создания сделки"""
+
+    title: str
+    description: str
+    price: float
+    currency: Optional[Currency] = Currency.RUB
+    deadline_at: Optional[datetime.datetime]
+    customer_id: int
+    performer_id: int
+
+
+DisputeCreateSchema = pydantic_model_creator(Deal, include=("title", "description"))
+
+DealCreateResponseSchema = pydantic_model_creator(
+    Deal, name="Create deal response", include=("id", "deal_type")
+)
+DealFullResponseSchema = pydantic_model_creator(Deal, name="Deal response")
+'''
 class DisputeCreateSchema(BaseModel):
     """Схема создания спора"""
 
@@ -71,3 +93,4 @@ class DealUpdateSchema(BaseModel):
     deadline_at: Optional[datetime.datetime] = None
     customer_id: Optional[int] = None
     performer_id: Optional[int] = None
+'''

@@ -148,3 +148,7 @@ class BaseDAO(ABC, Generic[DAOModel]):
         prefetch: str,
     ) -> Optional[DAOModel]:
         return await cls._model.get_or_none(**data).prefetch_related(prefetch)
+
+    @classmethod
+    async def update_or_create(cls, data: Dict[str, Any], defaults: Dict[str, Any]):
+        return await cls._model.update_or_create(defaults=defaults, **data)
