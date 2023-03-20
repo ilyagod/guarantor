@@ -1,9 +1,14 @@
-from tortoise import fields, models
-from tortoise.fields import ReverseRelation
+from __future__ import annotations
 
-from guarantor.db.models.dispute import Dispute
-from guarantor.db.models.user import User
+import typing
+
+from tortoise import fields, models
+
 from guarantor.enums import Currency, DealStatus, DealType
+
+if typing.TYPE_CHECKING:
+    from guarantor.db.models.dispute import Dispute
+    from guarantor.db.models.user import User
 
 
 class Deal(models.Model):
@@ -17,20 +22,21 @@ class Deal(models.Model):
     status = fields.CharEnumField(DealStatus, default=DealStatus.CREATED)
     deal_type = fields.CharEnumField(DealType, default=DealType.COMMON)
 
-    customer: fields.ForeignKeyRelation["User"] = fields.ForeignKeyField(
-        "models.User", related_name="deals_as_customer"
+    # chat_id = fields.UUIDField(default=uuid.uuid4)
+
+    customer: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
+        "models.User",
+        related_name="deals_as_customer",
     )
-    performer: fields.ForeignKeyRelation["User"] = fields.ForeignKeyField(
-        "models.User", related_name="deals_as_performer"
+    performer: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
+        "models.User",
+        related_name="deals_as_performer",
     )
 
     deadline_at = fields.DatetimeField(default=None, null=True)
     created_at = fields.DatetimeField(auto_now_add=True)
 
-    dispute: ReverseRelation["Dispute"]
+    dispute: fields.ReverseRelation[Dispute]
 
     class Meta:
         table = "deals"
-
-    class PydanticMeta:
-        exclude_raw_fields = False

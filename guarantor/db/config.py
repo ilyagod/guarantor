@@ -3,10 +3,13 @@ from typing import List
 from guarantor.settings import settings
 
 MODELS_MODULES: List[str] = [
-    # "guarantor.db.models.api_client",
     "guarantor.db.models.user",
     "guarantor.db.models.deal",
     "guarantor.db.models.dispute",
+    "guarantor.db.models.payment_gateway",
+    "guarantor.db.models.payment",
+    "guarantor.db.models.user_correct",
+    "guarantor.db.models.tron_wallet",
 ]  # noqa: WPS407
 
 TORTOISE_CONFIG = {  # noqa: WPS407

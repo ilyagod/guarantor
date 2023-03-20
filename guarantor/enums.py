@@ -22,7 +22,13 @@ class DealType(str, Enum):
     COMMON = "common"
 
 
-class DisputeStatus(str, Enum):
-    OPEN = "open"
-    CLOSED_SUCCESS = "closed_success"
-    CLOSED_REJECTED = "closed_rejected"
+class PaymentStatus(str, Enum):
+    WAITING = "waiting"
+    SUCCESS = "success"
+    ERROR = "error"
+
+
+class TronWalletStatus(str, Enum):
+    WAITING = "waiting"
+    RECEIVED = "received"
+    TRANSFERED = "transfered"

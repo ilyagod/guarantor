@@ -1,4 +1,3 @@
-import uuid
 from typing import Any, AsyncGenerator, Dict
 from unittest.mock import Mock
 
@@ -11,7 +10,6 @@ from tortoise import Tortoise
 from tortoise.contrib.test import finalizer, initializer
 
 from guarantor.db.config import MODELS_MODULES, TORTOISE_CONFIG
-from guarantor.db.dao.api_client import ApiClientDAO
 from guarantor.services.kafka.dependencies import get_kafka_producer
 from guarantor.services.kafka.lifetime import init_kafka, shutdown_kafka
 from guarantor.settings import settings
@@ -89,16 +87,9 @@ async def client(
     :yield: client for the app.
     """
 
-    obj = await ApiClientDAO.create(
-        {
-            "name": "test",
-            "token": uuid.uuid4(),
-        },
-    )
     async with AsyncClient(
         app=fastapi_app,
         base_url="http://test",
-        headers={"api_key": str(obj.token)},
     ) as ac:
         yield ac
 

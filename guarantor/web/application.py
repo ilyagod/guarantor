@@ -40,5 +40,35 @@ def get_app() -> FastAPI:
         config=TORTOISE_CONFIG,
         add_exception_handlers=True,
     )
+    # logging.getLogger('socketio').setLevel(logging.DEBUG)
+    # logging.getLogger('engineio').setLevel(logging.DEBUG)
 
+    # @SocketIO().sio.on('*')
+    # def connect(*args, **kwargs):
+    #    logger.info('connected', args, kwargs)
+
+    # app.mount('/', SocketIO().asgi_app)
+
+    """
+    @app.websocket("/ws")
+    async def websocket_endpoint(websocket: WebSocket):
+       await websocket.accept()
+       while True:
+           data = await websocket.receive_text()
+           await websocket.send_text(f"Message text was: {data}")
+    """
     return app
+
+
+# app = get_app()
+
+# sio = socketio.AsyncServer(async_mode='asgi')
+# sio_asgi_app = socketio.ASGIApp(sio, app)
+# app.mount("/api/socket.io", sio_asgi_app)
+
+# @app.websocket("/ws")
+# async def websocket_endpoint(websocket: WebSocket):
+#    await websocket.accept()
+#    while True:
+#        data = await websocket.receive_text()
+#        await websocket.send_text(f"Message text was: {data}")

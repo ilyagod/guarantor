@@ -38,7 +38,7 @@ class BaseDAO(ABC, Generic[DAOModel]):
         cls,
         id_: int,
         data: Dict[str, Any],
-        prefetch: str = None,
+        prefetch: Optional[str] = None,
     ) -> DAOModel:
         query = cls._model.get(id=id_)
         if prefetch:
@@ -51,7 +51,7 @@ class BaseDAO(ABC, Generic[DAOModel]):
         return obj
 
     @classmethod
-    async def get_by_id(cls, id_: int, prefetch: str = None) -> DAOModel:
+    async def get_by_id(cls, id_: int, prefetch: Optional[str] = None) -> DAOModel:
         query = cls._model.get(id=id_)
         if prefetch:
             query = query.prefetch_related(prefetch)
@@ -150,5 +150,9 @@ class BaseDAO(ABC, Generic[DAOModel]):
         return await cls._model.get_or_none(**data).prefetch_related(prefetch)
 
     @classmethod
-    async def update_or_create(cls, data: Dict[str, Any], defaults: Dict[str, Any]):
+    async def update_or_create(
+        cls,
+        data: Dict[str, Any],
+        defaults: Dict[str, Any],
+    ) -> Tuple[DAOModel, bool]:
         return await cls._model.update_or_create(defaults=defaults, **data)

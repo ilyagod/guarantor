@@ -5,8 +5,6 @@ from tempfile import gettempdir
 from pydantic import BaseSettings
 from yarl import URL
 
-from guarantor.enums import DealStatus
-
 TEMP_DIR = Path(gettempdir())
 
 
@@ -51,6 +49,8 @@ class Settings(BaseSettings):
 
     kafka_bootstrap_servers: list[str] = ["guarantor-kafka:9092"]
 
+    tron_network: str = "shasta"
+
     @property
     def db_url(self) -> URL:
         """
@@ -66,16 +66,6 @@ class Settings(BaseSettings):
             password=self.db_pass,
             path=f"/{self.db_base}",
         )
-
-    @property
-    def deal_status_change_rule(self):
-        return {
-            DealStatus.UNCONFIRMED: {
-                DealStatus.CANCELLED,
-                DealStatus.COMPLETED,
-                DealStatus.CONFIRMED,
-            },
-        }
 
     class Config:
         env_file = ".env"

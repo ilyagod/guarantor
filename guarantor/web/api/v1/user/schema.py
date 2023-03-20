@@ -1,8 +1,17 @@
-from tortoise.contrib.pydantic import pydantic_model_creator
+from pydantic import BaseModel
 
-from guarantor.db.models.user import User
+from guarantor.enums import Currency
 
-UserCreateOrUpdateSchema = pydantic_model_creator(
-    User, name="User Create", exclude=("id",)
-)
-UserResponseSchema = pydantic_model_creator(User, name="User Response", include=("id",))
+
+class UserCreateOrUpdateSchema(BaseModel):
+    name: str
+    external_id: int
+
+
+class UserCreateOrUpdateResponseSchema(BaseModel):
+    id: int
+
+
+class UserBalanceResponseSchema(BaseModel):
+    currency: Currency
+    balance: float
