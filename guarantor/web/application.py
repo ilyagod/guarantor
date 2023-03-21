@@ -1,9 +1,13 @@
+import logging
 from importlib import metadata
 
+import socketio
 from fastapi import FastAPI
 from fastapi.responses import UJSONResponse
+from loguru import logger
 from tortoise.contrib.fastapi import register_tortoise
 
+from guarantor.common.socketio import SocketIO
 from guarantor.db.config import TORTOISE_CONFIG
 from guarantor.logging import configure_logging
 from guarantor.web.api.router import api_router
@@ -40,14 +44,19 @@ def get_app() -> FastAPI:
         config=TORTOISE_CONFIG,
         add_exception_handlers=True,
     )
-    # logging.getLogger('socketio').setLevel(logging.DEBUG)
-    # logging.getLogger('engineio').setLevel(logging.DEBUG)
+    logging.getLogger('socketio').setLevel(logging.DEBUG)
+    logging.getLogger('engineio').setLevel(logging.DEBUG)
 
-    # @SocketIO().sio.on('*')
-    # def connect(*args, **kwargs):
-    #    logger.info('connected', args, kwargs)
+    #sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=["*"])
+    #asgi_app = socketio.ASGIApp(
+    #    socketio_server=sio, socketio_path="socket.io"
+    #)
+    s = SocketIO()
+    @s.sio.event
+    def connect(*args, **kwargs):
+       logger.info('connected', args, kwargs)
 
-    # app.mount('/', SocketIO().asgi_app)
+    app.mount('/', s.asgi_app)
 
     """
     @app.websocket("/ws")

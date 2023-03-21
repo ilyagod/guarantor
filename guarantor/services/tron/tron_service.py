@@ -40,6 +40,6 @@ class TronService:
             r = await client.get(f'https://{subdomain}.tronscan.org/api/account/tokens'
                                  f'?address={address}')
             for token in r.json()['data']:
-                if token['tokenAbbr'].lower() == token_type:
+                if token['tokenAbbr'].lower() == token_type.lower():
                     return token['quantity']
         return 0

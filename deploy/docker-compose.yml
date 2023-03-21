@@ -1,14 +1,13 @@
 version: '3.9'
-
-services:
-  api:
+x-backend:
+  &backend
     build:
       context: .
       dockerfile: ./deploy/Dockerfile
     image: guarantor:${GUARANTOR_VERSION:-latest}
     restart: always
     env_file:
-    - .env
+      - .env
     depends_on:
       db:
         condition: service_healthy
@@ -22,6 +21,18 @@ services:
       GUARANTOR_DB_PASS: guarantor
       GUARANTOR_DB_BASE: guarantor
       TESTKAFKA_KAFKA_BOOTSTRAP_SERVERS: '["guarantor-kafka:9092"]'
+
+services:
+  api:
+    <<: *backend
+    command: /usr/local/bin/python -m guarantor
+
+  celery:
+    <<: *backend
+    command: celery --app=guarantor.celery.worker.celery_app worker --loglevel DEBUG
+  beat:
+    <<: *backend
+    command: celery --app=guarantor.celery.worker.celery_app beat --loglevel DEBUG
 
   db:
     image: postgres:13.8-bullseye
@@ -52,6 +63,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
+  redis:
+    image: bitnami/redis:6.2.5
+    hostname: "guarantor-redis"
+    restart: always
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 50
 
   zookeeper:
     image: "bitnami/zookeeper:3.7.1"
@@ -82,6 +104,7 @@ services:
     depends_on:
       zookeeper:
         condition: service_healthy
+
 
 
 

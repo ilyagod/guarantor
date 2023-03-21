@@ -24,4 +24,4 @@ RUN apt-get purge -y \
 COPY . /app/src/
 RUN poetry install
 
-CMD ["/usr/local/bin/python", "-m", "guarantor"]
+# CMD ["/usr/local/bin/python", "-m", "guarantor"]
