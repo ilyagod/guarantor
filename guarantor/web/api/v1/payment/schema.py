@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
@@ -23,4 +23,4 @@ class PaymentDepositResponse(BaseModel):
     amount: float
     currency: Currency
     status: PaymentStatus
-    gateway_data: Optional[dict] = {}
+    gateway_data: Optional[Dict[str, Any]] = {}

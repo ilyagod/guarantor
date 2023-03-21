@@ -27,8 +27,8 @@ tronpy = "^0.3.0"
 fastapi-socketio = "^0.0.10"
 websocket = "^0.2.1"
 redis = "^4.5.2"
-celery = {extras = ["redis"], version = "^5.2.7"}
 asgiref = "^3.6.0"
+fastapi-utils = "^0.2.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.2.1"

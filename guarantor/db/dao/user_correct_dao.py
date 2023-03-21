@@ -1,3 +1,5 @@
+from typing import Any, Dict, List
+
 from tortoise.functions import Sum
 
 from guarantor.db.dao.base import BaseDAO
@@ -9,7 +11,7 @@ class UserCorrectDAO(BaseDAO[UserCorrect]):
     _model = UserCorrect
 
     @classmethod
-    async def get_balances(cls, user_id: int):
+    async def get_balances(cls, user_id: int) -> List[Dict[str, Any]]:
         balances = {x.value: 0 for x in Currency}
         result = (
             await cls._model.filter(user_id=user_id)

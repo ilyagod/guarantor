@@ -14,5 +14,6 @@ class SocketIO:
     def __init__(self):
         self.sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=["*"])
         self.asgi_app = socketio.ASGIApp(
-            socketio_server=self.sio, socketio_path="socket.io"
+            socketio_server=self.sio,
+            socketio_path="socket.io",
         )

@@ -1,7 +1,6 @@
 import logging
 from importlib import metadata
 
-import socketio
 from fastapi import FastAPI
 from fastapi.responses import UJSONResponse
 from loguru import logger
@@ -44,19 +43,20 @@ def get_app() -> FastAPI:
         config=TORTOISE_CONFIG,
         add_exception_handlers=True,
     )
-    logging.getLogger('socketio').setLevel(logging.DEBUG)
-    logging.getLogger('engineio').setLevel(logging.DEBUG)
+    logging.getLogger("socketio").setLevel(logging.DEBUG)
+    logging.getLogger("engineio").setLevel(logging.DEBUG)
 
-    #sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=["*"])
-    #asgi_app = socketio.ASGIApp(
+    # sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=["*"])
+    # asgi_app = socketio.ASGIApp(
     #    socketio_server=sio, socketio_path="socket.io"
-    #)
+    # )
     s = SocketIO()
+
     @s.sio.event
     def connect(*args, **kwargs):
-       logger.info('connected', args, kwargs)
+        logger.info("connected", args, kwargs)
 
-    app.mount('/', s.asgi_app)
+    app.mount("/", s.asgi_app)
 
     """
     @app.websocket("/ws")

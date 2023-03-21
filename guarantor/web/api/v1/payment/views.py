@@ -1,7 +1,8 @@
-from typing import List
+from typing import Any, Dict, List
 
 from fastapi import APIRouter, Depends
 
+from guarantor.db.models.payment_gateway import PaymentGateway
 from guarantor.services.payment.payment_service import PaymentService
 from guarantor.web.api.v1.payment.schema import (
     PaymentDepositRequest,
@@ -15,7 +16,7 @@ router = APIRouter()
 @router.get("/gateways", response_model=List[PaymentGatewayResponse])
 async def gateways_list(
     svc: PaymentService = Depends(),
-) -> dict:
+) -> List[PaymentGateway]:
     """
     Payment Gateway List
     """
@@ -26,7 +27,10 @@ async def gateways_list(
 async def deposit(
     data: PaymentDepositRequest,
     svc: PaymentService = Depends(),
-):
+) -> Dict[str, Any]:
     return await svc.create_payment(
-        data.gateway_id, data.amount, data.user_id, data.currency
+        data.gateway_id,
+        data.amount,
+        data.user_id,
+        data.currency,
     )

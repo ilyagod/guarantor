@@ -2,8 +2,6 @@ from typing import Awaitable, Callable
 
 from fastapi import FastAPI
 
-from guarantor.services.kafka.lifetime import init_kafka, shutdown_kafka
-
 
 def register_startup_event(
     app: FastAPI,
@@ -20,8 +18,13 @@ def register_startup_event(
 
     @app.on_event("startup")
     async def _startup() -> None:  # noqa: WPS430
-        await init_kafka(app)
+        # await init_kafka(app)
         pass  # noqa: WPS420
+
+    # @app.on_event("startup")
+    # @repeat_every(seconds=60)
+    # async def task_check_payments():
+    #     await check_payments()
 
     return _startup
 
@@ -38,7 +41,7 @@ def register_shutdown_event(
 
     @app.on_event("shutdown")
     async def _shutdown() -> None:  # noqa: WPS430
-        await shutdown_kafka(app)
+        # await shutdown_kafka(app)
         pass  # noqa: WPS420
 
     return _shutdown
