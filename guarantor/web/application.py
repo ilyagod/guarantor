@@ -1,5 +1,6 @@
 import logging
 from importlib import metadata
+from typing import Any
 
 from fastapi import FastAPI
 from fastapi.responses import UJSONResponse
@@ -53,7 +54,7 @@ def get_app() -> FastAPI:
     s = SocketIO()
 
     @s.sio.event
-    def connect(*args, **kwargs):
+    def connect(*args: Any, **kwargs: Any) -> None:
         logger.info("connected", args, kwargs)
 
     app.mount("/", s.asgi_app)

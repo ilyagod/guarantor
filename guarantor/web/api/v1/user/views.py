@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, Dict, List
 
 from fastapi import APIRouter, Depends
 
@@ -28,7 +28,7 @@ async def create_or_update_user(
 @router.get("/{user_id}/balance", response_model=List[UserBalanceResponseSchema])
 async def user_balance(
     user_id: int,
-):
+) -> List[Dict[str, Any]]:
     """
     User Balance
     """

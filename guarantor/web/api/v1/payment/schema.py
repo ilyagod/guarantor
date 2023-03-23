@@ -6,6 +6,8 @@ from guarantor.enums import Currency, PaymentStatus
 
 
 class PaymentGatewayResponse(BaseModel):
+    """Response schema for payment gateways"""
+
     id: int
     name: str
     logo: Optional[str] = None
@@ -13,6 +15,8 @@ class PaymentGatewayResponse(BaseModel):
 
 
 class PaymentDepositRequest(BaseModel):
+    """Deposit payment schema"""
+
     gateway_id: int
     amount: float
     user_id: int
@@ -20,6 +24,8 @@ class PaymentDepositRequest(BaseModel):
 
 
 class PaymentDepositResponse(BaseModel):
+    """Response schema after deposit"""
+
     amount: float
     currency: Currency
     status: PaymentStatus

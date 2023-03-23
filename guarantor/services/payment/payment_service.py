@@ -1,5 +1,5 @@
 import importlib
-from typing import Any, List
+from typing import Any, Dict, List
 
 from tortoise.transactions import atomic
 
@@ -18,7 +18,7 @@ class PaymentService:
         amount: float,
         user_id: int,
         currency: Currency,
-    ):
+    ) -> Dict[str, Any]:
         payment_gateway = await PaymentGatewayDAO.get_or_none({"id": gateway_id})
         if not payment_gateway:
             raise PaymentGatewayNotFound
@@ -49,10 +49,10 @@ class PaymentService:
         }
 
     async def get_gateways(self) -> List[PaymentGateway]:
-        return await PaymentGatewayDAO.get_all(100, 0)
+        return await PaymentGatewayDAO.all()
 
     @classmethod
-    def get_gateway_module(cls, name) -> Any:
+    def get_gateway_module(cls, name: str) -> Any:
         svc = importlib.import_module(f"guarantor.services.{name}.{name}_service")
         return getattr(svc, f"{name.title()}Service")()
 

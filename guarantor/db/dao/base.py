@@ -156,3 +156,7 @@ class BaseDAO(ABC, Generic[DAOModel]):
         defaults: Dict[str, Any],
     ) -> Tuple[DAOModel, bool]:
         return await cls._model.update_or_create(defaults=defaults, **data)
+
+    @classmethod
+    async def all(cls) -> List[DAOModel]:
+        return await cls._model.all()
