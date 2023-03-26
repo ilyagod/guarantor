@@ -11,8 +11,8 @@ class Currency(str, Enum):
 class DealStatus(str, Enum):
     CREATED = "created"
     DENY_PERFORMER = "deny_performer"
+    WAITING_FOR_PAYMENT = "waiting_for_payment"
     CONFIRM_PERFORMER = "confirm_performer"
-    IN_PROCESS = "in_process"
     CLOSE = "close"
     ARB_CLOSE_CUSTOMER = "arb_close_customer"
     ARB_CLOSE_PERFORMER = "arb_close_performer"

@@ -51,6 +51,11 @@ class Settings(BaseSettings):
 
     tron_network: str = "shasta"
 
+    disable_check_payments: bool = True
+    tron_main_wallet: str = ""
+    usdt_trc20_address: str = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+    tron_fee_limit: float = 5_000_000
+
     @property
     def db_url(self) -> URL:
         """

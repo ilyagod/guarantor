@@ -1,8 +1,9 @@
+import json
 import logging
 from importlib import metadata
 from typing import Any
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, Request
 from fastapi.responses import UJSONResponse
 from loguru import logger
 from tortoise.contrib.fastapi import register_tortoise
@@ -47,38 +48,22 @@ def get_app() -> FastAPI:
     logging.getLogger("socketio").setLevel(logging.DEBUG)
     logging.getLogger("engineio").setLevel(logging.DEBUG)
 
-    # sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=["*"])
-    # asgi_app = socketio.ASGIApp(
-    #    socketio_server=sio, socketio_path="socket.io"
-    # )
-    s = SocketIO()
-
-    @s.sio.event
-    def connect(*args: Any, **kwargs: Any) -> None:
-        logger.info("connected", args, kwargs)
-
-    app.mount("/", s.asgi_app)
-
-    """
-    @app.websocket("/ws")
-    async def websocket_endpoint(websocket: WebSocket):
-       await websocket.accept()
-       while True:
-           data = await websocket.receive_text()
-           await websocket.send_text(f"Message text was: {data}")
-    """
     return app
 
 
-# app = get_app()
+app = get_app()
+s = SocketIO()
 
-# sio = socketio.AsyncServer(async_mode='asgi')
-# sio_asgi_app = socketio.ASGIApp(sio, app)
-# app.mount("/api/socket.io", sio_asgi_app)
 
-# @app.websocket("/ws")
-# async def websocket_endpoint(websocket: WebSocket):
-#    await websocket.accept()
-#    while True:
-#        data = await websocket.receive_text()
-#        await websocket.send_text(f"Message text was: {data}")
+@s.sio.event
+async def connect(sid, environ, auth) -> None:
+    s.sio
+    await s.sio.emit('a', {'hello': auth})
+    #logger.info(args)
+    #logger.info(kwargs)
+
+app.mount("/", s.asgi_app)
+
+
+def get_app_for_uvicorn():
+    return app

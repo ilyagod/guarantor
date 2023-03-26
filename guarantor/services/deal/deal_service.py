@@ -1,9 +1,12 @@
 from datetime import datetime
 from typing import Optional
 
+from tortoise.transactions import in_transaction
+
 from guarantor.constants import DEAL_UPDATE_STATUS_RULE, DISPUTE_CREATE_STATUS_ALLOWED
 from guarantor.db.dao.deal_dao import DealDAO
 from guarantor.db.dao.dispute_dao import DisputeDAO
+from guarantor.db.dao.user_correct_dao import UserCorrectDAO
 from guarantor.db.dao.user_dao import UserDAO
 from guarantor.db.models.deal import Deal
 from guarantor.enums import Currency, DealStatus
@@ -50,7 +53,17 @@ class DealService:
 
     async def confirm_deal(self, deal_id: int) -> Deal:
         deal = await DealDAO.get_by_id(deal_id)
-        return await self._update_status(deal, DealStatus.CONFIRM_PERFORMER)
+        balances = await UserCorrectDAO.get_balances_dict(deal.customer.id)
+        if balances.get(deal.currency, 0) >= deal.price:
+            await UserCorrectDAO.create_correct(
+                deal.customer.id,
+                deal.price,
+                deal.currency,
+            )
+            new_status = DealStatus.CONFIRM_PERFORMER
+        else:
+            new_status = DealStatus.WAITING_FOR_PAYMENT
+        return await self._update_status(deal, new_status)
 
     async def deny_deal(self, deal_id: int) -> Deal:
         deal = await DealDAO.get_by_id(deal_id)
@@ -79,12 +92,33 @@ class DealService:
     async def close_customer(self, deal_id: int) -> Deal:
         return await self._close_dispute(deal_id, DealStatus.ARB_CLOSE_CUSTOMER)
 
+    async def close(self, deal_id: int) -> Deal:
+        deal = await DealDAO.get_by_id(deal_id)
+        async with in_transaction():
+            async with in_transaction():
+                await UserCorrectDAO.create_correct(
+                    deal.performer.id,
+                    deal.price,
+                    deal.currency,
+                )
+            return await self._update_status(deal, DealStatus.CLOSE)
+
     async def _close_dispute(self, deal_id: int, status: DealStatus) -> Deal:
         deal = await DealDAO.get_by_id(deal_id)
         if not deal.dispute:
             raise DisputeDoesNotExists
-
-        return await DealDAO.update(deal_id, {"status": status})
+        async with in_transaction():
+            user_id = (
+                deal.customer.id
+                if status == DealStatus.ARB_CLOSE_CUSTOMER
+                else deal.performer.id
+            )
+            await UserCorrectDAO.create_correct(
+                user_id,
+                deal.price,
+                deal.currency,
+            )
+            return await DealDAO.update(deal_id, {"status": status})
 
     async def _update_status(self, deal: Deal, to_status: DealStatus) -> Deal:
         if not self._status_change_allowed(deal.status, to_status):

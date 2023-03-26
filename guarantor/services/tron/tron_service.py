@@ -6,6 +6,7 @@ from tronpy import AsyncTron
 
 from guarantor.db.dao.payment_dao import PaymentDAO
 from guarantor.db.dao.tron_wallet_dao import TronWalletDAO
+from guarantor.db.dao.user_correct_dao import UserCorrectDAO
 from guarantor.enums import Currency, PaymentStatus, TronWalletStatus
 from guarantor.settings import settings
 
@@ -59,16 +60,43 @@ class TronService:
         payment = await PaymentDAO.get_by_id(payment_id)
         if not wallet:
             return False
-        balance = self.get_balance(wallet.address)
+        balance = await self.get_balance(wallet.address)
 
         if wallet.amount != balance:
             return False
 
         async with in_transaction():
+            await self.transfer(
+                wallet.address,
+                wallet.private_key,
+                settings.tron_main_wallet,
+                balance,
+            )
+
             payment.status = PaymentStatus.SUCCESS
             await payment.save()
 
             wallet.status = TronWalletStatus.RECEIVED
             await wallet.save()
 
+            await UserCorrectDAO.create_correct(payment.user.id, balance, Currency.USDT)
+
             return True
+
+    async def transfer(
+        self,
+        from_address: str,
+        from_private_key: str,
+        to_address: str,
+        amount: float,
+    ) -> dict[str, Any]:
+        async with AsyncTron(network=settings.tron_network) as client:
+            contract = await client.get_contract(settings.usdt_trc20_address)
+            txb = (
+                contract.functions.transfer(to_address, amount)
+                .with_owner(from_address)
+                .fee_limit(settings.tron_fee_limit)
+            )
+            txn = await txb.build()
+            txn_ret = await txn.sign(from_private_key).broadcast()
+            return await txn_ret.wait()

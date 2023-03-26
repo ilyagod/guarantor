@@ -75,3 +75,14 @@ async def close_dispute_performer(
 ) -> Response:
     await svc.close_performer(deal_id)
     return Response(status_code=status.HTTP_200_OK)
+
+
+@router.get(
+    "/{deal_id}/close",
+)
+async def close_deal(
+    deal_id: int,
+    svc: DealService = Depends(DealService),
+) -> Response:
+    await svc.close(deal_id)
+    return Response(status_code=status.HTTP_200_OK)

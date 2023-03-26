@@ -17,7 +17,7 @@ class Deal(models.Model):
     title = fields.CharField(max_length=128)
     description = fields.TextField()
 
-    price = fields.DecimalField(12, 2)
+    price = fields.FloatField()
     currency = fields.CharEnumField(Currency, default=Currency.RUB)
     status = fields.CharEnumField(DealStatus, default=DealStatus.CREATED)
     deal_type = fields.CharEnumField(DealType, default=DealType.COMMON)

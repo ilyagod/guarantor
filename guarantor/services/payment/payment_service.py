@@ -1,5 +1,5 @@
 import importlib
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from tortoise.transactions import atomic
 
@@ -8,6 +8,7 @@ from guarantor.db.dao.payment_gateway_dao import PaymentGatewayDAO
 from guarantor.db.models.payment_gateway import PaymentGateway
 from guarantor.enums import Currency
 from guarantor.services.payment.exceptions import PaymentGatewayNotFound
+from guarantor.services.tron.tron_service import TronService
 
 
 class PaymentService:
@@ -52,7 +53,7 @@ class PaymentService:
         return await PaymentGatewayDAO.all()
 
     @classmethod
-    def get_gateway_module(cls, name: str) -> Any:
+    def get_gateway_module(cls, name: str) -> Union[TronService]:
         svc = importlib.import_module(f"guarantor.services.{name}.{name}_service")
         return getattr(svc, f"{name.title()}Service")()
 
