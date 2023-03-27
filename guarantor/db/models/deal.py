@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing
+import uuid
 
 from tortoise import fields, models
 
@@ -18,11 +19,11 @@ class Deal(models.Model):
     description = fields.TextField()
 
     price = fields.FloatField()
-    currency = fields.CharEnumField(Currency, default=Currency.RUB)
+    currency = fields.CharEnumField(Currency, default=Currency.USDT)
     status = fields.CharEnumField(DealStatus, default=DealStatus.CREATED)
     deal_type = fields.CharEnumField(DealType, default=DealType.COMMON)
 
-    # chat_id = fields.UUIDField(default=uuid.uuid4)
+    chat_id = fields.UUIDField(default=uuid.uuid4)
 
     customer: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
         "models.User",

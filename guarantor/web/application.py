@@ -1,16 +1,14 @@
-import json
 import logging
 from importlib import metadata
-from typing import Any
 
-from fastapi import FastAPI, Depends, Request
+from fastapi import FastAPI
 from fastapi.responses import UJSONResponse
-from loguru import logger
 from tortoise.contrib.fastapi import register_tortoise
 
-from guarantor.common.socketio import SocketIO
+from guarantor.common.socketio import asgi_app, sio
 from guarantor.db.config import TORTOISE_CONFIG
 from guarantor.logging import configure_logging
+from guarantor.socketio.chat.handlers import sio_connect_handler, sio_message_handler
 from guarantor.web.api.router import api_router
 from guarantor.web.lifetime import register_shutdown_event, register_startup_event
 
@@ -48,22 +46,10 @@ def get_app() -> FastAPI:
     logging.getLogger("socketio").setLevel(logging.DEBUG)
     logging.getLogger("engineio").setLevel(logging.DEBUG)
 
-    return app
+    # Socket IO handlers
+    sio.on("connect", handler=sio_connect_handler)
+    sio.on("message", handler=sio_message_handler)
 
+    app.mount("/", asgi_app)
 
-app = get_app()
-s = SocketIO()
-
-
-@s.sio.event
-async def connect(sid, environ, auth) -> None:
-    s.sio
-    await s.sio.emit('a', {'hello': auth})
-    #logger.info(args)
-    #logger.info(kwargs)
-
-app.mount("/", s.asgi_app)
-
-
-def get_app_for_uvicorn():
     return app

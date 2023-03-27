@@ -14,7 +14,7 @@ class DealCreateSchema(BaseModel):
     title: str
     description: str
     price: float
-    currency: Optional[Currency] = Currency.RUB
+    currency: Optional[Currency] = Currency.USDT
     deadline_at: Optional[datetime.datetime]
     customer_id: int
     performer_id: int

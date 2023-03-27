@@ -10,6 +10,7 @@ MODELS_MODULES: List[str] = [
     "guarantor.db.models.payment",
     "guarantor.db.models.user_correct",
     "guarantor.db.models.tron_wallet",
+    "guarantor.db.models.chat_message",
 ]  # noqa: WPS407
 
 TORTOISE_CONFIG = {  # noqa: WPS407
