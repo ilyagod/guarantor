@@ -24,6 +24,8 @@ class Payment(models.Model):
     status = fields.CharEnumField(PaymentStatus, default=PaymentStatus.WAITING)
     currency = fields.CharEnumField(Currency)
     amount = fields.DecimalField(12, 2)
+    withdraw = fields.BooleanField(default=False, null=True)
+    data = fields.JSONField(default={}, null=True)
 
     class Meta:
         table = "payments"

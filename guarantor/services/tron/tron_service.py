@@ -15,9 +15,30 @@ class TronService:
     # def __init__(self):
     #    #self.client = Tron(network=settings.tron_network)
 
-    async def generate_address(self) -> Dict[str, Any]:
+    @classmethod
+    async def generate_address(cls) -> Dict[str, Any]:
         async with AsyncTron(network=settings.tron_network) as client:
             return client.generate_address()
+
+    #  async def calculate_need_energy(self):
+
+    async def create_payment_withdraw(
+        self,
+        gateway_id: int,
+        amount: float,
+        user_id: int,
+        currency: Currency,
+        payment_id: int,
+        data: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        result = await self.transfer(
+            settings.main_wallet_config["base58check_address"],
+            settings.main_wallet_config["hex_address"],
+            data.get("wallet", ""),
+            amount,
+        )
+        await PaymentDAO.update(payment_id, {"status": PaymentStatus.SUCCESS})
+        return result
 
     async def create_payment(
         self,
@@ -66,10 +87,16 @@ class TronService:
             return False
 
         async with in_transaction():
+            await self.trx_transfer(
+                settings.main_wallet_config["base58check_address"],
+                settings.main_wallet_config["private_key"],
+                wallet.address,
+                settings.tron_trx_commission,
+            )
             await self.transfer(
                 wallet.address,
                 wallet.private_key,
-                settings.tron_main_wallet,
+                settings.main_wallet_config["base58check_address"],
                 balance,
             )
 
@@ -99,4 +126,21 @@ class TronService:
             )
             txn = await txb.build()
             txn_ret = await txn.sign(from_private_key).broadcast()
+            return await txn_ret.wait()
+
+    async def trx_transfer(
+        self,
+        from_address: str,
+        from_private_key: str,
+        to_address: str,
+        amount: float,
+    ) -> dict[str, Any]:
+        async with AsyncTron(network=settings.tron_network) as client:
+            txb = client.trx.transfer(
+                from_address,
+                to_address,
+                amount,
+            ).memo("test memo")
+            txn = await txb.build()
+            txn_ret = await txn.sign(from_private_key)
             return await txn_ret.wait()

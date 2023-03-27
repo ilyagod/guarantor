@@ -30,3 +30,11 @@ class PaymentDepositResponse(BaseModel):
     currency: Currency
     status: PaymentStatus
     gateway_data: Optional[Dict[str, Any]] = {}
+
+
+class PaymentWithdrawRequest(BaseModel):
+    gateway_id: int
+    amount: float
+    user_id: int
+    currency: Currency
+    data: Dict[str, Any]

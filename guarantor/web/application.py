@@ -6,6 +6,7 @@ from fastapi.responses import UJSONResponse
 from tortoise.contrib.fastapi import register_tortoise
 
 from guarantor.common.socketio import asgi_app, sio
+from guarantor.common.utils import populate_main_wallet_setting
 from guarantor.db.config import TORTOISE_CONFIG
 from guarantor.logging import configure_logging
 from guarantor.socketio.chat.handlers import sio_connect_handler, sio_message_handler
@@ -49,7 +50,9 @@ def get_app() -> FastAPI:
     # Socket IO handlers
     sio.on("connect", handler=sio_connect_handler)
     sio.on("message", handler=sio_message_handler)
-
     app.mount("/", asgi_app)
+
+    # Main wallet config
+    populate_main_wallet_setting()
 
     return app

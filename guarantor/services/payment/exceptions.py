@@ -13,3 +13,7 @@ class BasePaymentException(HTTPException):
 
 class PaymentGatewayNotFound(BasePaymentException):
     detail = "Payment Gateway not found"
+
+
+class WithdrawPaymentAmountMoreBalance(BasePaymentException):
+    detail = "Amount is more than the balance"

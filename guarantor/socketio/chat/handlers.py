@@ -16,7 +16,7 @@ async def sio_connect_handler(
 ) -> None:
     if not auth:
         raise ConnectionRefusedError("authentication failed")
-    chat_id = auth.get('token')
+    chat_id = auth.get("token")
     deal = await DealDAO.get_or_none({"chat_id": chat_id})
     if not deal:
         raise ConnectionRefusedError("authentication failed")
