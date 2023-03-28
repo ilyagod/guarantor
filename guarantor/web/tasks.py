@@ -13,7 +13,7 @@ async def check_payments() -> None:
     payments = await PaymentDAO.get_payments_for_check()
     logger.info([x.id for x in payments])
 
-    if settings.disable_check_payments:
+    if settings.payments_disable_check:
         return
 
     if not payments:

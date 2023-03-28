@@ -31,7 +31,6 @@ class DealService:
         performer_id: int,
         deadline_at: Optional[datetime] = None,
     ) -> Deal:
-
         for id_, exc in {
             customer_id: CustomerUserNotFound,
             performer_id: PerformerUserNotFound,

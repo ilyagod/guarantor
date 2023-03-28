@@ -13,11 +13,11 @@ from guarantor.settings import settings
 
 class TronService:
     # def __init__(self):
-    #    #self.client = Tron(network=settings.tron_network)
+    #    #self.client = Tron(network=settings.payments_tron_network)
 
     @classmethod
     async def generate_address(cls) -> Dict[str, Any]:
-        async with AsyncTron(network=settings.tron_network) as client:
+        async with AsyncTron(network=settings.payments_tron_network) as client:
             return client.generate_address()
 
     #  async def calculate_need_energy(self):
@@ -32,8 +32,8 @@ class TronService:
         data: Dict[str, Any],
     ) -> Dict[str, Any]:
         result = await self.transfer(
-            settings.main_wallet_config["base58check_address"],
-            settings.main_wallet_config["hex_address"],
+            settings.payments_tron_main_wallet_config["base58check_address"],
+            settings.payments_tron_main_wallet_config["hex_address"],
             data.get("wallet", ""),
             amount,
         )
@@ -62,8 +62,8 @@ class TronService:
 
     async def get_balance(self, address: str, token_type: str = "usdt") -> float:
         subdomain = (
-            f"{settings.tron_network}api"
-            if settings.tron_network != "mainnet"
+            f"{settings.payments_tron_network}api"
+            if settings.payments_tron_network != "mainnet"
             else "api"
         )
         async with httpx.AsyncClient() as client:
@@ -88,15 +88,15 @@ class TronService:
 
         async with in_transaction():
             await self.trx_transfer(
-                settings.main_wallet_config["base58check_address"],
-                settings.main_wallet_config["private_key"],
+                settings.payments_tron_main_wallet_config["base58check_address"],
+                settings.payments_tron_main_wallet_config["private_key"],
                 wallet.address,
-                settings.tron_trx_commission,
+                settings.payments_tron_trx_commission,
             )
             await self.transfer(
                 wallet.address,
                 wallet.private_key,
-                settings.main_wallet_config["base58check_address"],
+                settings.payments_tron_main_wallet_config["base58check_address"],
                 balance,
             )
 
@@ -117,12 +117,14 @@ class TronService:
         to_address: str,
         amount: float,
     ) -> dict[str, Any]:
-        async with AsyncTron(network=settings.tron_network) as client:
-            contract = await client.get_contract(settings.usdt_trc20_address)
+        async with AsyncTron(network=settings.payments_tron_network) as client:
+            contract = await client.get_contract(
+                settings.payments_tron_usdt_trc20_address
+            )
             txb = (
                 contract.functions.transfer(to_address, amount)
                 .with_owner(from_address)
-                .fee_limit(settings.tron_fee_limit)
+                .fee_limit(settings.payments_tron_fee_limit)
             )
             txn = await txb.build()
             txn_ret = await txn.sign(from_private_key).broadcast()
@@ -135,7 +137,7 @@ class TronService:
         to_address: str,
         amount: float,
     ) -> dict[str, Any]:
-        async with AsyncTron(network=settings.tron_network) as client:
+        async with AsyncTron(network=settings.payments_tron_network) as client:
             txb = client.trx.transfer(
                 from_address,
                 to_address,

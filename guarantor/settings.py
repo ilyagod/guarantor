@@ -50,14 +50,13 @@ class Settings(BaseSettings):
 
     kafka_bootstrap_servers: list[str] = ["guarantor-kafka:9092"]
 
-    tron_network: str = "shasta"
+    payments_tron_network: str = "shasta"
 
-    disable_check_payments: bool = True
-    tron_main_wallet: str = ""
-    usdt_trc20_address: str = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
-    tron_fee_limit: float = 5_000_000
-    main_wallet_config: Dict[str, str] = {}
-    tron_trx_commission: int = 28_000_000
+    payments_disable_check: bool = True
+    payments_tron_usdt_trc20_address: str = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+    payments_tron_fee_limit: float = 5_000_000
+    payments_tron_main_wallet_config: Dict[str, str] = {}
+    payments_tron_trx_commission: int = 28_000_000
 
     @property
     def db_url(self) -> URL:
@@ -74,22 +73,6 @@ class Settings(BaseSettings):
             password=self.db_pass,
             path=f"/{self.db_base}",
         )
-
-    """
-    @property
-    def main_wallet_config(self) -> Dict[str, str]:
-        file_path = os.path.join(os.path.dirname(__file__), 'main_wallet.json')
-        if os.path.isfile(file_path):
-            with open(file_path, 'r') as f:
-                self._main_wallet_config = json.loads(f.read())
-        else:
-            client = Tron(network=self.tron_network)
-            self._main_wallet_config = client.generate_address()
-            with open(file_path, 'w') as f:
-                json.dump(self._main_wallet_config, f)
-
-        return self._main_wallet_config
-    """
 
     class Config:
         env_file = ".env"
