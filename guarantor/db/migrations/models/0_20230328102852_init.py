@@ -45,6 +45,8 @@ CREATE TABLE IF NOT EXISTS "payments" (
     "status" VARCHAR(7) NOT NULL  DEFAULT 'waiting',
     "currency" VARCHAR(4) NOT NULL,
     "amount" DECIMAL(12,2) NOT NULL,
+    "withdraw" BOOL   DEFAULT False,
+    "data" JSONB,
     "gateway_id" INT NOT NULL REFERENCES "payment_gateways" ("id") ON DELETE CASCADE,
     "user_id" INT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE
 );
@@ -63,11 +65,8 @@ CREATE TABLE IF NOT EXISTS "tron_wallets" (
     "address" TEXT NOT NULL,
     "private_key" TEXT NOT NULL,
     "public_key" TEXT NOT NULL,
-    "status" VARCHAR(10) NOT NULL  DEFAULT 'waiting',
-    "amount" DECIMAL(12,2) NOT NULL,
-    "payment_id" INT NOT NULL UNIQUE REFERENCES "payments" ("id") ON DELETE CASCADE
+    "user_id" INT NOT NULL UNIQUE REFERENCES "users" ("id") ON DELETE CASCADE
 );
-COMMENT ON COLUMN "tron_wallets"."status" IS 'WAITING: waiting\nRECEIVED: received\nTRANSFERED: transfered';
 CREATE TABLE IF NOT EXISTS "chat_messages" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "message" TEXT NOT NULL,

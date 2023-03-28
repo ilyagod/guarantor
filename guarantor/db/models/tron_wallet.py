@@ -4,10 +4,8 @@ from typing import TYPE_CHECKING
 
 from tortoise import fields, models
 
-from guarantor.enums import TronWalletStatus
-
 if TYPE_CHECKING:
-    from guarantor.db.models.payment import Payment
+    from guarantor.db.models.user import User
 
 
 class TronWallet(models.Model):
@@ -15,11 +13,9 @@ class TronWallet(models.Model):
     address = fields.TextField()
     private_key = fields.TextField()
     public_key = fields.TextField()
-    status = fields.CharEnumField(TronWalletStatus, default=TronWalletStatus.WAITING)
-    amount = fields.DecimalField(12, 2)
 
-    payment: fields.OneToOneRelation[Payment] = fields.OneToOneField(
-        "models.Payment",
+    user: fields.OneToOneRelation[User] = fields.OneToOneField(
+        "models.User",
     )
 
     class Meta:

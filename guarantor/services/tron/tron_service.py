@@ -7,7 +7,8 @@ from tronpy import AsyncTron
 from guarantor.db.dao.payment_dao import PaymentDAO
 from guarantor.db.dao.tron_wallet_dao import TronWalletDAO
 from guarantor.db.dao.user_correct_dao import UserCorrectDAO
-from guarantor.enums import Currency, PaymentStatus, TronWalletStatus
+from guarantor.db.dao.user_dao import UserDAO
+from guarantor.enums import Currency, PaymentStatus
 from guarantor.settings import settings
 
 
@@ -48,17 +49,19 @@ class TronService:
         currency: Currency,
         payment_id: int,
     ) -> Dict[str, Any]:
-        wallet = await self.generate_address()
-        await TronWalletDAO.create(
-            {
-                "address": wallet["base58check_address"],
-                "private_key": wallet["private_key"],
-                "public_key": wallet["public_key"],
-                "amount": amount,
-                "payment_id": payment_id,
-            },
-        )
-        return {"address": wallet["base58check_address"]}
+        user = await UserDAO.get_by_id(user_id)
+        wallet = user.tron_wallet
+        if not user.tron_wallet:
+            new_wallet = await self.generate_address()
+            wallet = await TronWalletDAO.create(
+                {
+                    "address": new_wallet["base58check_address"],
+                    "private_key": new_wallet["private_key"],
+                    "public_key": new_wallet["public_key"],
+                },
+            )
+            await user.refresh_from_db()
+        return {"address": wallet.address}
 
     async def get_balance(self, address: str, token_type: str = "usdt") -> float:
         subdomain = (
@@ -83,7 +86,7 @@ class TronService:
             return False
         balance = await self.get_balance(wallet.address)
 
-        if wallet.amount != balance:
+        if payment.amount != balance:
             return False
 
         async with in_transaction():
@@ -103,9 +106,6 @@ class TronService:
             payment.status = PaymentStatus.SUCCESS
             await payment.save()
 
-            wallet.status = TronWalletStatus.RECEIVED
-            await wallet.save()
-
             await UserCorrectDAO.create_correct(payment.user.id, balance, Currency.USDT)
 
             return True
@@ -119,7 +119,7 @@ class TronService:
     ) -> dict[str, Any]:
         async with AsyncTron(network=settings.payments_tron_network) as client:
             contract = await client.get_contract(
-                settings.payments_tron_usdt_trc20_address
+                settings.payments_tron_usdt_trc20_address,
             )
             txb = (
                 contract.functions.transfer(to_address, amount)
